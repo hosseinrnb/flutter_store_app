@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_store_app/constants/color.dart';
+import 'package:flutter_store_app/di/di.dart';
 import 'package:flutter_store_app/screens/card_screen.dart';
 import 'package:flutter_store_app/screens/category_screen.dart';
 import 'package:flutter_store_app/screens/home_screen.dart';
@@ -11,7 +12,9 @@ import 'package:flutter_store_app/widgets/horizontal_category.dart';
 import 'package:flutter_store_app/widgets/product_item.dart';
 import 'package:flutter_store_app/screens/product_list_screen.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await getItInit();
   runApp(const MyApp());
 }
 
