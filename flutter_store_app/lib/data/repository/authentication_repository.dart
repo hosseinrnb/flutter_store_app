@@ -2,6 +2,7 @@ import 'package:dartz/dartz.dart';
 import 'package:flutter_store_app/data/datasource/authentication_datasource.dart';
 import 'package:flutter_store_app/di/di.dart';
 import 'package:flutter_store_app/util/api_exception.dart';
+import 'package:flutter_store_app/util/auth_manager.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 
@@ -32,7 +33,7 @@ class AuthenticationRepository implements IAuthRepository{
     try {
       String token = await _datasource.login(username, password);
       if (token.isNotEmpty) {
-        _sharedPref.setString('access_token',token);
+        AuthManger.saveToken(token);
         return right('شما با موفقیت وارد شدید');
       } else {
         return left('شما وارد نشدید');

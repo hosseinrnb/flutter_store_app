@@ -1,10 +1,13 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_store_app/bloc/authentication/auth_bloc.dart';
 import 'package:flutter_store_app/constants/color.dart';
 import 'package:flutter_store_app/di/di.dart';
 import 'package:flutter_store_app/screens/card_screen.dart';
 import 'package:flutter_store_app/screens/category_screen.dart';
 import 'package:flutter_store_app/screens/home_screen.dart';
+import 'package:flutter_store_app/screens/login_screen.dart';
 import 'package:flutter_store_app/screens/product_detail_screen.dart';
 import 'package:flutter_store_app/screens/profile_screen.dart';
 import 'package:flutter_store_app/widgets/banner_slider.dart';
@@ -33,9 +36,9 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
-        body: IndexedStack(
-          index: selectedBottomNavigationIndex,
-          children: getScreens(),
+        body: BlocProvider(
+          create: (context) => AuthBloc(),
+          child: LoginScreen(),
         ),
         bottomNavigationBar: ClipRRect(
           child: BackdropFilter(
@@ -152,3 +155,8 @@ class _MyAppState extends State<MyApp> {
     ];
   }
 }
+
+// IndexedStack(
+//           index: selectedBottomNavigationIndex,
+//           children: getScreens(),
+//         )
