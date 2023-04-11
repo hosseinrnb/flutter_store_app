@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_store_app/bloc/authentication/auth_bloc.dart';
 import 'package:flutter_store_app/bloc/category/category_bloc.dart';
+import 'package:flutter_store_app/bloc/home/home_bloc.dart';
 import 'package:flutter_store_app/constants/color.dart';
 import 'package:flutter_store_app/di/di.dart';
 import 'package:flutter_store_app/screens/card_screen.dart';
@@ -155,7 +156,10 @@ class _MyAppState extends State<MyApp> {
         create: (context) => CategoryBloc(),
         child: const CategoryScreen(),
       ),
-      const HomeScreen(),
+      BlocProvider(
+        create: (context) => HomeBloc(),
+        child: const HomeScreen(),
+      ),
     ];
   }
 }
