@@ -5,6 +5,7 @@ import 'package:flutter_store_app/bloc/home/home_event.dart';
 import 'package:flutter_store_app/bloc/home/home_state.dart';
 import 'package:flutter_store_app/constants/color.dart';
 import 'package:flutter_store_app/data/model/banner.dart';
+import 'package:flutter_store_app/data/model/category.dart';
 import 'package:flutter_store_app/widgets/product_item.dart';
 import 'package:flutter_store_app/widgets/banner_slider.dart';
 import 'package:flutter_store_app/widgets/horizontal_category.dart';
@@ -35,7 +36,13 @@ class _HomeScreenState extends State<HomeScreen> {
                 const _getSearchBox(),
                 if (state is HomeLoadingState) ...[
                   const SliverToBoxAdapter(
-                    child: CircularProgressIndicator(),
+                    child: Center(
+                      child: SizedBox(
+                        width: 24,
+                        height: 24,
+                        child: CircularProgressIndicator(),
+                      ),
+                    ),
                   ),
                 ],
                 if (state is HomeRequestSuccessState) ...[
@@ -50,8 +57,19 @@ class _HomeScreenState extends State<HomeScreen> {
                     },
                   ),
                 ],
-                _getCategoryListText(),
-                _getCategoryList(),
+                const _getCategoryListText(),
+                if (state is HomeRequestSuccessState) ...[
+                  state.categoryList.fold(
+                    (l) {
+                      return SliverToBoxAdapter(
+                        child: Text(l),
+                      );
+                    },
+                    (r) {
+                      return _getCategoryList(r);
+                    },
+                  ),
+                ],
                 _getBestSellerTitle(),
                 _getBestSellerProducts(),
                 _getMostViewedTitle(),
@@ -216,7 +234,9 @@ class _getCategoryListText extends StatelessWidget {
 }
 
 class _getCategoryList extends StatelessWidget {
-  const _getCategoryList({
+  List<Category> listCategories;
+  _getCategoryList(
+    this.listCategories, {
     Key? key,
   }) : super(key: key);
 
@@ -231,11 +251,11 @@ class _getCategoryList extends StatelessWidget {
             height: 100,
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
-              itemCount: 10,
+              itemCount: listCategories.length,
               itemBuilder: ((context, index) {
-                return const Padding(
-                  padding: EdgeInsets.only(left: 20),
-                  child: CategoryHorizontalItem(),
+                return Padding(
+                  padding: const EdgeInsets.only(left: 20),
+                  child: CategoryHorizontalItem(listCategories[index]),
                 );
               }),
             ),
