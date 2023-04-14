@@ -54,7 +54,8 @@ class ProductListScreen extends StatelessWidget {
                   childAspectRatio: 2 / 2.8,
                 ),
                 delegate: SliverChildBuilderDelegate((context, index) {
-                  return const ProductItem();
+                  //return const ProductItem();
+                  return const Text('1');
                 }),
               ),
             ),

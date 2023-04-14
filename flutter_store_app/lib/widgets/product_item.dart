@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_store_app/constants/color.dart';
+import 'package:flutter_store_app/data/model/product.dart';
+import 'package:flutter_store_app/widgets/cached_image.dart';
 
 class ProductItem extends StatelessWidget {
-  const ProductItem({Key? key}) : super(key: key);
+  Product product;
+  ProductItem(this.product,{Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +26,11 @@ class ProductItem extends StatelessWidget {
               alignment: AlignmentDirectional.center,
               children: [
                 const SizedBox(width: double.infinity),
-                Image.asset('assets/images/iphone.png'),
+                SizedBox(
+                  width: 95,
+                  height: 95,
+                  child: CachedImage(imageUrl: product.thumbnail),
+                ),
                 Positioned(
                   top: 0,
                   right: 10,
@@ -41,11 +48,11 @@ class ProductItem extends StatelessWidget {
                       color: Colors.red,
                       borderRadius: BorderRadius.all(Radius.circular(15)),
                     ),
-                    child: const Padding(
-                      padding: EdgeInsets.symmetric(vertical: 2, horizontal: 6),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 6),
                       child: Text(
-                        '%3',
-                        style: TextStyle(
+                        '%${product.persent!.round().toString()}',
+                        style: const TextStyle(
                           color: Colors.white,
                           fontSize: 12,
                           fontFamily: 'SB',
@@ -57,11 +64,13 @@ class ProductItem extends StatelessWidget {
               ],
             ),
             const Spacer(),
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 5),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 5),
               child: Text(
-                'آیفون 13 پرومکس',
-                style: TextStyle(
+                product.name,
+                maxLines: 1,
+                textAlign: TextAlign.start,
+                style: const TextStyle(
                   fontFamily: 'SM',
                   fontSize: 14,
                 ),
@@ -98,10 +107,10 @@ class ProductItem extends StatelessWidget {
                     Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       //crossAxisAlignment: CrossAxisAlignment.start,
-                      children: const[
+                      children: [
                         Text(
-                          '49،800،000',
-                          style: TextStyle(
+                          product.price.toString(),
+                          style: const TextStyle(
                             fontSize: 12,
                             fontFamily: 'SM',
                             color: Colors.white,
@@ -109,8 +118,8 @@ class ProductItem extends StatelessWidget {
                           ),
                         ),
                         Text(
-                          '48،800،000',
-                          style: TextStyle(
+                          product.realPrice.toString(),
+                          style: const TextStyle(
                             fontSize: 15.5,
                             fontFamily: 'SM',
                             color: Colors.white,
