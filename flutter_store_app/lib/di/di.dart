@@ -3,9 +3,11 @@ import 'package:flutter_store_app/data/datasource/authentication_datasource.dart
 import 'package:flutter_store_app/data/datasource/banner_datasource.dart';
 import 'package:flutter_store_app/data/datasource/category_datasource.dart';
 import 'package:flutter_store_app/data/datasource/product_datasource.dart';
+import 'package:flutter_store_app/data/datasource/product_detail_datasource.dart';
 import 'package:flutter_store_app/data/repository/authentication_repository.dart';
 import 'package:flutter_store_app/data/repository/banner_repository.dart';
 import 'package:flutter_store_app/data/repository/category_repository.dart';
+import 'package:flutter_store_app/data/repository/product_detail_repository.dart';
 import 'package:flutter_store_app/data/repository/product_repository.dart';
 import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -25,6 +27,7 @@ Future<void> getItInit() async {
   locator.registerFactory<ICategoryDatasource>(() => CategoryRemoteDatasource());
   locator.registerFactory<IBannerDatasource>(() => BannerRemoteDatasource());
   locator.registerFactory<IProductDatasource>(() => ProductRemoteDatasource());
+  locator.registerFactory<IDetailProductDatasource>(() => DetailProductRemoteDatasource());
 
 
   //repositories
@@ -32,5 +35,6 @@ Future<void> getItInit() async {
   locator.registerFactory<ICategoryRepository>(() => CategoryRepository());
   locator.registerFactory<IBannerRepository>(() => BannerRepository());
   locator.registerFactory<IProductRepository>(() => ProductRepository());
+  locator.registerFactory<IDetailProductRepository>(() => DetailProductRepository());
 
 }

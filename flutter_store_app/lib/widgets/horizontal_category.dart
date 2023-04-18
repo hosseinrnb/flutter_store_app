@@ -36,9 +36,9 @@ class CategoryHorizontalItem extends StatelessWidget {
               ),
             ),
             SizedBox(
-              width: 24,
-              height: 24,
-              child: CachedImage(imageUrl: category.icon),
+              width: 25,
+              height: 25,
+              child: Center(child: CachedImage(imageUrl: category.icon)),
             ),
           ],
         ),
