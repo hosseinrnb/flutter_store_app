@@ -8,7 +8,7 @@ import 'package:flutter_store_app/di/di.dart';
 import '../../util/api_exception.dart';
 
 abstract class IDetailProductRepository{
-  Future<Either<String,List<ProductImage>>> getProductImage();
+  Future<Either<String,List<ProductImage>>> getProductImage(String productId);
   Future<Either<String,List<VariantType>>> getVatiantTypes();
   Future<Either<String,List<ProductVariant>>> getProductVariants();
 }
@@ -18,9 +18,9 @@ class DetailProductRepository extends IDetailProductRepository{
   final IDetailProductDatasource _datasource = locator.get();
 
   @override
-  Future<Either<String, List<ProductImage>>> getProductImage() async {
+  Future<Either<String, List<ProductImage>>> getProductImage(String productId) async {
     try {
-      var response = await _datasource.getGallery();
+      var response = await _datasource.getGallery(productId);
       return right(response);
     } on ApiException catch (ex) {
       return left(ex.message ?? 'unknown error!');

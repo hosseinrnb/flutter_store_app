@@ -8,7 +8,7 @@ import 'package:flutter_store_app/di/di.dart';
 import '../../util/api_exception.dart';
 
 abstract class IDetailProductDatasource {
-  Future<List<ProductImage>> getGallery();
+  Future<List<ProductImage>> getGallery(String productId);
   Future<List<VariantType>> getVariantTypes();
   Future<List<Variant>> getVariants();
   Future<List<ProductVariant>> getProductVariants();
@@ -20,9 +20,9 @@ class DetailProductRemoteDatasource extends IDetailProductDatasource{
   final Dio _dio = locator.get();
 
   @override
-  Future<List<ProductImage>> getGallery() async {
+  Future<List<ProductImage>> getGallery(String productId) async {
     try {
-      Map<String,String> qParams = {'filter': 'product_id="0tc0e5ju89x5ogj"'};
+      Map<String,String> qParams = {'filter': 'product_id="$productId"'};
       var response = await _dio.get('collections/gallery/records', queryParameters: qParams);
       return response.data['items']
           .map<ProductImage>((jsonObject) => ProductImage.fromMapJson(jsonObject))

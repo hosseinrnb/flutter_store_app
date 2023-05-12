@@ -6,6 +6,7 @@ import 'package:flutter_store_app/bloc/product/product_bloc.dart';
 import 'package:flutter_store_app/bloc/product/product_event.dart';
 import 'package:flutter_store_app/bloc/product/product_state.dart';
 import 'package:flutter_store_app/constants/color.dart';
+import 'package:flutter_store_app/data/model/product.dart';
 import 'package:flutter_store_app/data/model/product_image.dart';
 import 'package:flutter_store_app/data/model/product_variant.dart';
 import 'package:flutter_store_app/data/model/variant.dart';
@@ -14,7 +15,8 @@ import 'package:flutter_store_app/widgets/cached_image.dart';
 import '../data/model/variant_type.dart';
 
 class ProductDetailScreen extends StatefulWidget {
-  const ProductDetailScreen({Key? key}) : super(key: key);
+  Product product;
+  ProductDetailScreen(this.product, {Key? key}) : super(key: key);
 
   @override
   State<ProductDetailScreen> createState() => _ProductDetailScreenState();
@@ -23,7 +25,8 @@ class ProductDetailScreen extends StatefulWidget {
 class _ProductDetailScreenState extends State<ProductDetailScreen> {
   @override
   void initState() {
-    BlocProvider.of<ProductBloc>(context).add(ProductInitEvent());
+    BlocProvider.of<ProductBloc>(context)
+        .add(ProductInitEvent(widget.product.id));
     super.initState();
   }
 
@@ -93,7 +96,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                   state.productImages.fold((l) {
                     return SliverToBoxAdapter(child: Text(l));
                   }, (r) {
-                    return GalleryWidget(r);
+                    return GalleryWidget(widget.product.thumbnail,r);
                   })
                 ],
                 if (state is ProductDetailResponseState) ...[
@@ -334,8 +337,10 @@ class VariantGeneratorChild extends StatelessWidget {
 
 class GalleryWidget extends StatefulWidget {
   List<ProductImage> productImageList;
+  String defaultProductThumbnail;
   int selectedItem = 0;
   GalleryWidget(
+    this.defaultProductThumbnail,
     this.productImageList, {
     Key? key,
   }) : super(key: key);
@@ -371,11 +376,14 @@ class _GalleryWidgetState extends State<GalleryWidget> {
                       ),
                       const Spacer(),
                       SizedBox(
-                        height: double.infinity,
+                        height: 200,
+                        width: 200,
                         child: CachedImage(
-                            imageUrl: widget
-                                .productImageList[widget.selectedItem]
-                                .imageUrl),
+                          imageUrl: (widget.productImageList.isEmpty)
+                              ? widget.defaultProductThumbnail
+                              : widget.productImageList[widget.selectedItem]
+                                  .imageUrl,
+                        ),
                       ),
                       const Spacer(),
                       Image.asset('assets/images/icon_favorite.png'),
@@ -383,45 +391,47 @@ class _GalleryWidgetState extends State<GalleryWidget> {
                   ),
                 ),
               ),
-              SizedBox(
-                height: 70,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 40),
-                  child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: widget.productImageList.length,
-                    itemBuilder: (context, index) {
-                      return GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            widget.selectedItem = index;
-                          });
-                        },
-                        child: Container(
-                          margin: const EdgeInsets.only(left: 10, right: 10),
-                          height: 70,
-                          width: 70,
-                          decoration: BoxDecoration(
-                            borderRadius:
-                                const BorderRadius.all(Radius.circular(10)),
-                            border: Border.all(
-                              color: CustomColor.grey,
-                              width: 1,
+              if (widget.productImageList.isNotEmpty) ...{
+                SizedBox(
+                  height: 70,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 40),
+                    child: ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: widget.productImageList.length,
+                      itemBuilder: (context, index) {
+                        return GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              widget.selectedItem = index;
+                            });
+                          },
+                          child: Container(
+                            margin: const EdgeInsets.only(left: 10, right: 10),
+                            height: 70,
+                            width: 70,
+                            decoration: BoxDecoration(
+                              borderRadius:
+                                  const BorderRadius.all(Radius.circular(10)),
+                              border: Border.all(
+                                color: CustomColor.grey,
+                                width: 1,
+                              ),
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(5),
+                              child: CachedImage(
+                                  imageUrl:
+                                      widget.productImageList[index].imageUrl),
                             ),
                           ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(5),
-                            child: CachedImage(
-                                imageUrl:
-                                    widget.productImageList[index].imageUrl),
-                          ),
-                        ),
-                      );
-                    },
+                        );
+                      },
+                    ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 30),
+                const SizedBox(height: 30),
+              }
             ],
           ),
         ),
@@ -575,38 +585,41 @@ class ColorVariantList extends StatefulWidget {
 }
 
 class _ColorVariantListState extends State<ColorVariantList> {
-  List<Widget> colorWidgets = [];
-
-  @override
-  void initState() {
-    for (var colorVariant in widget.variantsList) {
-      String variantColors = 'ff${colorVariant.value}';
-      int hexColor = int.parse(variantColors, radix: 16);
-      var item = Container(
-        margin: const EdgeInsets.symmetric(horizontal: 5),
-        height: 26,
-        width: 26,
-        decoration: BoxDecoration(
-          color: Color(hexColor),
-          borderRadius: const BorderRadius.all(Radius.circular(8)),
-        ),
-      );
-      colorWidgets.add(item);
-    }
-    super.initState();
-  }
-
+  int selectedIndex = 0;
   @override
   Widget build(BuildContext context) {
     return Directionality(
       textDirection: TextDirection.rtl,
       child: SizedBox(
-        height: 26,
+        height: 30,
         child: ListView.builder(
           scrollDirection: Axis.horizontal,
-          itemCount: colorWidgets.length,
+          itemCount: widget.variantsList.length,
           itemBuilder: (context, index) {
-            return colorWidgets[index];
+            String variantColors = 'ff${widget.variantsList[index].value}';
+            int hexColor = int.parse(variantColors, radix: 16);
+            return GestureDetector(
+              onTap: () {
+                setState(() {
+                  selectedIndex = index;
+                });
+              },
+              child: Container(
+                margin: const EdgeInsets.symmetric(horizontal: 5),
+                height: 28,
+                width: 28,
+                decoration: BoxDecoration(
+                  border: (selectedIndex == index)
+                      ? Border.all(
+                          width: 2,
+                          color: CustomColor.blueIndicator,
+                          strokeAlign: StrokeAlign.outside)
+                      : Border.all(width: 2, color: Colors.white),
+                  color: Color(hexColor),
+                  borderRadius: const BorderRadius.all(Radius.circular(8)),
+                ),
+              ),
+            );
           },
         ),
       ),
@@ -623,32 +636,7 @@ class StorageVariantList extends StatefulWidget {
 }
 
 class _StorageVariantListState extends State<StorageVariantList> {
-  List<Widget> storageWigets = [];
-
-  @override
-  void initState() {
-    for (var storageVariant in widget.storageVariants) {
-      var item = Container(
-        margin: const EdgeInsets.symmetric(horizontal: 5),
-        height: 26,
-        width: 70,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: const BorderRadius.all(Radius.circular(8)),
-          border: Border.all(color: CustomColor.grey, width: 1),
-        ),
-        child: Center(
-          child: Text(
-            storageVariant.value,
-            style: const TextStyle(fontFamily: 'SM', fontSize: 12),
-          ),
-        ),
-      );
-      storageWigets.add(item);
-    }
-    super.initState();
-  }
-
+  int selectedIndex = 0;
   @override
   Widget build(BuildContext context) {
     return Directionality(
@@ -657,9 +645,33 @@ class _StorageVariantListState extends State<StorageVariantList> {
         height: 26,
         child: ListView.builder(
           scrollDirection: Axis.horizontal,
-          itemCount: storageWigets.length,
+          itemCount: widget.storageVariants.length,
           itemBuilder: (context, index) {
-            return storageWigets[index];
+            return GestureDetector(
+              onTap: () {
+                setState(() {
+                  selectedIndex = index;
+                });
+              },
+              child: Container(
+                margin: const EdgeInsets.symmetric(horizontal: 5),
+                height: 26,
+                width: 70,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: const BorderRadius.all(Radius.circular(8)),
+                  border: (selectedIndex == index)
+                      ? Border.all(color: CustomColor.blueIndicator, width: 2)
+                      : Border.all(color: CustomColor.grey, width: 0),
+                ),
+                child: Center(
+                  child: Text(
+                    widget.storageVariants[index].value,
+                    style: const TextStyle(fontFamily: 'SM', fontSize: 12),
+                  ),
+                ),
+              ),
+            );
           },
         ),
       ),
