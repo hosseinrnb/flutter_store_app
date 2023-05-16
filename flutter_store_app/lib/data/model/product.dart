@@ -8,7 +8,7 @@ class Product {
   String popularity;
   String name;
   int quantity;
-  String category;
+  String categoryId;
   int? realPrice;
   num? persent;
 
@@ -22,10 +22,10 @@ class Product {
     this.popularity,
     this.name,
     this.quantity,
-    this.category,
+    this.categoryId,
   ) {
     realPrice = price + discountPrice;
-    persent = ((price - realPrice!)/price)*100;
+    persent = ((price - realPrice!) / price) * 100;
   }
 
   factory Product.fromMapJson(Map<String, dynamic> jsonObject) {

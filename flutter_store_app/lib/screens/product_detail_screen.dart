@@ -8,6 +8,7 @@ import 'package:flutter_store_app/bloc/product/product_state.dart';
 import 'package:flutter_store_app/constants/color.dart';
 import 'package:flutter_store_app/data/model/product.dart';
 import 'package:flutter_store_app/data/model/product_image.dart';
+import 'package:flutter_store_app/data/model/product_property.dart';
 import 'package:flutter_store_app/data/model/product_variant.dart';
 import 'package:flutter_store_app/data/model/variant.dart';
 import 'package:flutter_store_app/widgets/cached_image.dart';
@@ -26,7 +27,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   @override
   void initState() {
     BlocProvider.of<ProductBloc>(context)
-        .add(ProductInitEvent(widget.product.id));
+        .add(ProductInitEvent(widget.product.id, widget.product.categoryId));
     super.initState();
   }
 
@@ -41,54 +42,70 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               slivers: [
                 if (state is ProductDetailLoadingState) ...[
                   const SliverToBoxAdapter(
-                    child: SizedBox(
-                      height: 24,
-                      width: 24,
-                      child: CircularProgressIndicator(),
+                    child: Center(
+                      child: SizedBox(
+                        height: 24,
+                        width: 24,
+                        child: CircularProgressIndicator(),
+                      ),
                     ),
                   ),
                 ],
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.only(
-                        left: 35, right: 35, top: 20, bottom: 10),
-                    child: Container(
-                      height: 46,
-                      decoration: const BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.all(Radius.circular(15)),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 15),
-                        child: Row(
-                          children: [
-                            Image.asset('assets/images/icon_apple_blue.png'),
-                            const Expanded(
-                              child: Text(
-                                'آیفون',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontFamily: 'SB',
-                                  color: CustomColor.blue,
-                                ),
+                if (state is ProductDetailResponseState) ...{
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.only(
+                          left: 35, right: 35, top: 20, bottom: 10),
+                      child: Container(
+                        height: 46,
+                        decoration: const BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.all(Radius.circular(15)),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 15),
+                          child: Row(
+                            children: [
+                              Image.asset('assets/images/icon_apple_blue.png'),
+                              Expanded(
+                                child: state.productCategory.fold((l) {
+                                  return const Text(
+                                    'اطلاعات محصول',
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontFamily: 'SB',
+                                      color: CustomColor.blue,
+                                    ),
+                                  );
+                                }, (r) {
+                                  return Text(
+                                    r.title!,
+                                    textAlign: TextAlign.center,
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      fontFamily: 'SB',
+                                      color: CustomColor.blue,
+                                    ),
+                                  );
+                                }),
                               ),
-                            ),
-                            Image.asset('assets/images/icon_back.png'),
-                          ],
+                              Image.asset('assets/images/icon_back.png'),
+                            ],
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                ),
-                const SliverToBoxAdapter(
+                  )
+                },
+                SliverToBoxAdapter(
                   child: Padding(
-                    padding: EdgeInsets.only(top: 22, bottom: 20),
+                    padding: const EdgeInsets.only(top: 22, bottom: 20),
                     child: Text(
-                      'آیفون 13 پرومکس',
+                      widget.product.name,
                       textAlign: TextAlign.center,
                       textDirection: TextDirection.rtl,
-                      style: TextStyle(fontFamily: 'SB', fontSize: 16),
+                      style: const TextStyle(fontFamily: 'SB', fontSize: 16),
                     ),
                   ),
                 ),
@@ -96,7 +113,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                   state.productImages.fold((l) {
                     return SliverToBoxAdapter(child: Text(l));
                   }, (r) {
-                    return GalleryWidget(widget.product.thumbnail,r);
+                    return GalleryWidget(widget.product.thumbnail, r);
                   })
                 ],
                 if (state is ProductDetailResponseState) ...[
@@ -106,76 +123,14 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     return VariantContainerGenerator(r);
                   })
                 ],
-                SliverToBoxAdapter(
-                  child: Container(
-                    margin: const EdgeInsets.only(left: 44, right: 44, top: 20),
-                    height: 46,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: const BorderRadius.all(Radius.circular(15)),
-                      border: Border.all(color: CustomColor.grey, width: 1),
-                    ),
-                    child: Directionality(
-                      textDirection: TextDirection.rtl,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 10),
-                        child: Row(
-                          children: [
-                            const Text(
-                              'مشخصات فنی:',
-                              style: TextStyle(fontFamily: 'SM', fontSize: 12),
-                            ),
-                            const Spacer(),
-                            const Text(
-                              'مشاهده',
-                              style: TextStyle(
-                                  fontFamily: 'SB',
-                                  fontSize: 12,
-                                  color: CustomColor.blue),
-                            ),
-                            const SizedBox(width: 10),
-                            Image.asset('assets/images/icon_left_category.png'),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-                SliverToBoxAdapter(
-                  child: Container(
-                    margin: const EdgeInsets.only(left: 44, right: 44, top: 20),
-                    height: 46,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: const BorderRadius.all(Radius.circular(15)),
-                      border: Border.all(color: CustomColor.grey, width: 1),
-                    ),
-                    child: Directionality(
-                      textDirection: TextDirection.rtl,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 10),
-                        child: Row(
-                          children: [
-                            const Text(
-                              'توضیحات محصول:',
-                              style: TextStyle(fontFamily: 'SM', fontSize: 12),
-                            ),
-                            const Spacer(),
-                            const Text(
-                              'مشاهده',
-                              style: TextStyle(
-                                  fontFamily: 'SB',
-                                  fontSize: 12,
-                                  color: CustomColor.blue),
-                            ),
-                            const SizedBox(width: 10),
-                            Image.asset('assets/images/icon_left_category.png'),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
+                if (state is ProductDetailResponseState) ...[
+                  state.productProperties.fold((l) {
+                    return SliverToBoxAdapter(child: Text(l));
+                  }, (r) {
+                    return ProductProperties(r);
+                  })
+                ],
+                ProductDescription(widget.product.description),
                 SliverToBoxAdapter(
                   child: Container(
                     margin: const EdgeInsets.symmetric(
@@ -279,6 +234,190 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
             ),
           );
         },
+      ),
+    );
+  }
+}
+
+class ProductProperties extends StatefulWidget {
+  List<Property> productPropertiyList;
+  ProductProperties(
+    this.productPropertiyList, {
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  State<ProductProperties> createState() => _ProductPropertiesState();
+}
+
+class _ProductPropertiesState extends State<ProductProperties> {
+  bool _isVisible = false;
+  @override
+  Widget build(BuildContext context) {
+    return SliverToBoxAdapter(
+      child: Column(
+        children: [
+          GestureDetector(
+            onTap: () {
+              setState(() {
+                _isVisible = !_isVisible;
+              });
+            },
+            child: Container(
+              margin: const EdgeInsets.only(left: 44, right: 44, top: 20),
+              height: 46,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: const BorderRadius.all(Radius.circular(15)),
+                border: Border.all(color: CustomColor.grey, width: 1),
+              ),
+              child: Directionality(
+                textDirection: TextDirection.rtl,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  child: Row(
+                    children: [
+                      const Text(
+                        'مشخصات فنی:',
+                        style: TextStyle(fontFamily: 'SM', fontSize: 12),
+                      ),
+                      const Spacer(),
+                      const Text(
+                        'مشاهده',
+                        style: TextStyle(
+                            fontFamily: 'SB',
+                            fontSize: 12,
+                            color: CustomColor.blue),
+                      ),
+                      const SizedBox(width: 10),
+                      Image.asset('assets/images/icon_left_category.png'),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+          Visibility(
+            visible: _isVisible,
+            child: Container(
+              margin: const EdgeInsets.only(left: 44, right: 44, top: 20),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: const BorderRadius.all(Radius.circular(15)),
+                border: Border.all(color: CustomColor.grey, width: 1),
+              ),
+              child: Directionality(
+                textDirection: TextDirection.rtl,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: widget.productPropertiyList.length,
+                    itemBuilder: (context, index) {
+                      var property = widget.productPropertiyList[index];
+                      return Row(
+                        children: [
+                          Text(
+                            '${property.title} : ${property.value}',
+                            style: const TextStyle(
+                                fontFamily: 'SM', fontSize: 14, height: 1.8),
+                          ),
+                        ],
+                      );
+                    },
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class ProductDescription extends StatefulWidget {
+  String productDescription;
+  ProductDescription(
+    this.productDescription, {
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  State<ProductDescription> createState() => _ProductDescriptionState();
+}
+
+class _ProductDescriptionState extends State<ProductDescription> {
+  bool _isVisible = false;
+  @override
+  Widget build(BuildContext context) {
+    return SliverToBoxAdapter(
+      child: Column(
+        children: [
+          GestureDetector(
+            onTap: () {
+              setState(() {
+                _isVisible = !_isVisible;
+              });
+            },
+            child: Container(
+              margin: const EdgeInsets.only(left: 44, right: 44, top: 20),
+              height: 46,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: const BorderRadius.all(Radius.circular(15)),
+                border: Border.all(color: CustomColor.grey, width: 1),
+              ),
+              child: Directionality(
+                textDirection: TextDirection.rtl,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  child: Row(
+                    children: [
+                      const Text(
+                        'توضیحات محصول:',
+                        style: TextStyle(fontFamily: 'SM', fontSize: 12),
+                      ),
+                      const Spacer(),
+                      const Text(
+                        'مشاهده',
+                        style: TextStyle(
+                            fontFamily: 'SB',
+                            fontSize: 12,
+                            color: CustomColor.blue),
+                      ),
+                      const SizedBox(width: 10),
+                      Image.asset('assets/images/icon_left_category.png'),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+          Visibility(
+            visible: _isVisible,
+            child: Container(
+              margin: const EdgeInsets.only(left: 44, right: 44, top: 20),
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: const BorderRadius.all(Radius.circular(15)),
+                border: Border.all(color: CustomColor.grey, width: 1),
+              ),
+              child: Directionality(
+                textDirection: TextDirection.rtl,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  child: Text(
+                    widget.productDescription,
+                    style: const TextStyle(
+                        fontFamily: 'SM', fontSize: 16, height: 1.8),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
