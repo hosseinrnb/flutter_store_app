@@ -317,10 +317,12 @@ class _ProductPropertiesState extends State<ProductProperties> {
                       var property = widget.productPropertiyList[index];
                       return Row(
                         children: [
-                          Text(
-                            '${property.title} : ${property.value}',
-                            style: const TextStyle(
-                                fontFamily: 'SM', fontSize: 14, height: 1.8),
+                          Flexible(
+                            child: Text(
+                              '${property.title} : ${property.value}',
+                              style: const TextStyle(
+                                  fontFamily: 'SB', fontSize: 14, height: 1.8),
+                            ),
                           ),
                         ],
                       );

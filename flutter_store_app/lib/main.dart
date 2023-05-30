@@ -12,8 +12,6 @@ import 'package:flutter_store_app/screens/home_screen.dart';
 import 'package:flutter_store_app/screens/login_screen.dart';
 import 'package:flutter_store_app/screens/product_detail_screen.dart';
 import 'package:flutter_store_app/screens/profile_screen.dart';
-import 'package:flutter_store_app/widgets/banner_slider.dart';
-import 'package:flutter_store_app/widgets/horizontal_category.dart';
 import 'package:flutter_store_app/widgets/product_item.dart';
 import 'package:flutter_store_app/screens/product_list_screen.dart';
 
