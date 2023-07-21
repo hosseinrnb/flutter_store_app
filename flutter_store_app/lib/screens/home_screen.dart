@@ -45,7 +45,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
                 } else ...{
-                  const _getSearchBox(),
+                  const GetSearchBox(),
                   if (state is HomeRequestSuccessState) ...[
                     state.bannerList.fold(
                       (l) {
@@ -54,11 +54,11 @@ class _HomeScreenState extends State<HomeScreen> {
                         );
                       },
                       (r) {
-                        return _getBanners(r);
+                        return GetBanners(r);
                       },
                     ),
                   ],
-                  const _getCategoryListText(),
+                  const GetCategoryListText(),
                   if (state is HomeRequestSuccessState) ...[
                     state.categoryList.fold(
                       (l) {
@@ -67,11 +67,11 @@ class _HomeScreenState extends State<HomeScreen> {
                         );
                       },
                       (r) {
-                        return _getCategoryList(r);
+                        return GetCategoryList(r);
                       },
                     ),
                   ],
-                  const _getBestSellerTitle(),
+                  const GetBestSellerTitle(),
                   if (state is HomeRequestSuccessState) ...[
                     state.bestSellerProductList.fold(
                       (l) {
@@ -80,11 +80,11 @@ class _HomeScreenState extends State<HomeScreen> {
                         );
                       },
                       (r) {
-                        return _getBestSellerProducts(r);
+                        return GetBestSellerProducts(r);
                       },
                     ),
                   ],
-                  const _getMostViewedTitle(),
+                  const GetMostViewedTitle(),
                   if (state is HomeRequestSuccessState) ...[
                     state.hottestProductList.fold(
                       (l) {
@@ -93,7 +93,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         );
                       },
                       (r) {
-                        return _getMostViewedProducts(r);
+                        return GetMostViewedProducts(r);
                       },
                     ),
                   ],
@@ -107,9 +107,9 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
-class _getMostViewedProducts extends StatelessWidget {
-  List<Product> mvproductList;
-  _getMostViewedProducts(
+class GetMostViewedProducts extends StatelessWidget {
+  final List<Product> mvproductList;
+  const GetMostViewedProducts(
     this.mvproductList, {
     Key? key,
   }) : super(key: key);
@@ -140,8 +140,8 @@ class _getMostViewedProducts extends StatelessWidget {
   }
 }
 
-class _getMostViewedTitle extends StatelessWidget {
-  const _getMostViewedTitle({
+class GetMostViewedTitle extends StatelessWidget {
+  const GetMostViewedTitle({
     Key? key,
   }) : super(key: key);
 
@@ -172,9 +172,9 @@ class _getMostViewedTitle extends StatelessWidget {
   }
 }
 
-class _getBestSellerProducts extends StatelessWidget {
-  List<Product> bsproductList;
-  _getBestSellerProducts(
+class GetBestSellerProducts extends StatelessWidget {
+  final List<Product> bsproductList;
+  const GetBestSellerProducts(
     this.bsproductList, {
     Key? key,
   }) : super(key: key);
@@ -205,8 +205,8 @@ class _getBestSellerProducts extends StatelessWidget {
   }
 }
 
-class _getBestSellerTitle extends StatelessWidget {
-  const _getBestSellerTitle({
+class GetBestSellerTitle extends StatelessWidget {
+  const GetBestSellerTitle({
     Key? key,
   }) : super(key: key);
 
@@ -236,19 +236,19 @@ class _getBestSellerTitle extends StatelessWidget {
   }
 }
 
-class _getCategoryListText extends StatelessWidget {
-  const _getCategoryListText({
+class GetCategoryListText extends StatelessWidget {
+  const GetCategoryListText({
     Key? key,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return SliverToBoxAdapter(
+    return const SliverToBoxAdapter(
       child: Padding(
-        padding: const EdgeInsets.only(right: 44, left: 44, top: 20),
+        padding: EdgeInsets.only(right: 44, left: 44, top: 20),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.end,
-          children: const [
+          children: [
             Text(
               'دسته بندی',
               style: TextStyle(
@@ -261,9 +261,9 @@ class _getCategoryListText extends StatelessWidget {
   }
 }
 
-class _getCategoryList extends StatelessWidget {
-  List<Category> listCategories;
-  _getCategoryList(
+class GetCategoryList extends StatelessWidget {
+  final List<Category> listCategories;
+  const GetCategoryList(
     this.listCategories, {
     Key? key,
   }) : super(key: key);
@@ -294,9 +294,9 @@ class _getCategoryList extends StatelessWidget {
   }
 }
 
-class _getBanners extends StatelessWidget {
-  List<MyBanner> mybanner;
-  _getBanners(
+class GetBanners extends StatelessWidget {
+  final List<MyBanner> mybanner;
+  const GetBanners(
     this.mybanner, {
     Key? key,
   }) : super(key: key);
@@ -312,8 +312,8 @@ class _getBanners extends StatelessWidget {
   }
 }
 
-class _getSearchBox extends StatelessWidget {
-  const _getSearchBox({
+class GetSearchBox extends StatelessWidget {
+  const GetSearchBox({
     Key? key,
   }) : super(key: key);
 

@@ -5,7 +5,6 @@ import 'package:flutter_store_app/bloc/category/category_event.dart';
 import 'package:flutter_store_app/bloc/category/category_state.dart';
 import 'package:flutter_store_app/constants/color.dart';
 import 'package:flutter_store_app/data/model/category.dart';
-import 'package:flutter_store_app/data/repository/category_repository.dart';
 import 'package:flutter_store_app/widgets/cached_image.dart';
 
 class CategoryScreen extends StatefulWidget {
@@ -79,7 +78,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
                       ),
                     );
                   }, (r) {
-                    return _listCategory(list: r);
+                    return ListCategory(list: r);
                   });
                 }
                 return const SliverToBoxAdapter(
@@ -96,9 +95,9 @@ class _CategoryScreenState extends State<CategoryScreen> {
   }
 }
 
-class _listCategory extends StatelessWidget {
-  List<Category>? list;
-  _listCategory({super.key, required this.list});
+class ListCategory extends StatelessWidget {
+  final List<Category>? list;
+  const ListCategory({super.key, required this.list});
 
   @override
   Widget build(BuildContext context) {

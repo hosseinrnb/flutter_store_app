@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_store_app/bloc/basket/basket_bloc.dart';
 import 'package:flutter_store_app/bloc/product/product_bloc.dart';
 import 'package:flutter_store_app/constants/color.dart';
 import 'package:flutter_store_app/data/model/product.dart';
+import 'package:flutter_store_app/di/di.dart';
 import 'package:flutter_store_app/screens/product_detail_screen.dart';
 import 'package:flutter_store_app/widgets/cached_image.dart';
 
@@ -16,11 +18,14 @@ class ProductItem extends StatelessWidget {
       textDirection: TextDirection.rtl,
       child: GestureDetector(
         onTap: () {
-          Navigator.of(context).push(MaterialPageRoute(
-              builder: (context) => BlocProvider(
-                    create: (context) => ProductBloc(),
-                    child: ProductDetailScreen(product),
-                  )));
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => BlocProvider<BasketBloc>.value(
+                value: locator.get<BasketBloc>(),
+                child: ProductDetailScreen(product),
+              ),
+            ),
+          );
         },
         child: Container(
           height: 216,

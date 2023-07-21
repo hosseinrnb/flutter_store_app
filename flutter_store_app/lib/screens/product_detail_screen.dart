@@ -1,7 +1,8 @@
 import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_store_app/bloc/basket/basket_bloc.dart';
+import 'package:flutter_store_app/bloc/basket/basket_event.dart';
 import 'package:flutter_store_app/bloc/product/product_bloc.dart';
 import 'package:flutter_store_app/bloc/product/product_event.dart';
 import 'package:flutter_store_app/bloc/product/product_state.dart';
@@ -12,12 +13,12 @@ import 'package:flutter_store_app/data/model/product_property.dart';
 import 'package:flutter_store_app/data/model/product_variant.dart';
 import 'package:flutter_store_app/data/model/variant.dart';
 import 'package:flutter_store_app/widgets/cached_image.dart';
-
 import '../data/model/variant_type.dart';
 
+
 class ProductDetailScreen extends StatefulWidget {
-  Product product;
-  ProductDetailScreen(this.product, {Key? key}) : super(key: key);
+  final Product product;
+  const ProductDetailScreen(this.product, {Key? key}) : super(key: key);
 
   @override
   State<ProductDetailScreen> createState() => _ProductDetailScreenState();
@@ -25,11 +26,26 @@ class ProductDetailScreen extends StatefulWidget {
 
 class _ProductDetailScreenState extends State<ProductDetailScreen> {
   @override
-  void initState() {
-    BlocProvider.of<ProductBloc>(context)
-        .add(ProductInitEvent(widget.product.id, widget.product.categoryId));
-    super.initState();
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (context) {
+        var bloc = ProductBloc();
+        bloc.add(
+            ProductInitEvent(widget.product.id, widget.product.categoryId));
+        return bloc;
+      },
+      child: DetailContentWidget(parentWidget: widget),
+    );
   }
+}
+
+class DetailContentWidget extends StatelessWidget {
+  const DetailContentWidget({
+    Key? key,
+    required this.parentWidget,
+  }) : super(key: key);
+
+  final ProductDetailScreen parentWidget;
 
   @override
   Widget build(BuildContext context) {
@@ -102,7 +118,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                   child: Padding(
                     padding: const EdgeInsets.only(top: 22, bottom: 20),
                     child: Text(
-                      widget.product.name,
+                      parentWidget.product.name,
                       textAlign: TextAlign.center,
                       textDirection: TextDirection.rtl,
                       style: const TextStyle(fontFamily: 'SB', fontSize: 16),
@@ -113,7 +129,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                   state.productImages.fold((l) {
                     return SliverToBoxAdapter(child: Text(l));
                   }, (r) {
-                    return GalleryWidget(widget.product.thumbnail, r);
+                    return GalleryWidget(parentWidget.product.thumbnail, r);
                   })
                 ],
                 if (state is ProductDetailResponseState) ...[
@@ -130,7 +146,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     return ProductProperties(r);
                   })
                 ],
-                ProductDescription(widget.product.description),
+                ProductDescription(parentWidget.product.description),
                 SliverToBoxAdapter(
                   child: Container(
                     margin: const EdgeInsets.symmetric(
@@ -221,10 +237,10 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     child: Directionality(
                       textDirection: TextDirection.rtl,
                       child: Row(
-                        children: const [
-                          AddToBasketButton(),
-                          Spacer(),
-                          PriceTagButton(),
+                        children: [
+                          AddToBasketButton(parentWidget.product),
+                          const Spacer(),
+                          const PriceTagButton(),
                         ],
                       ),
                     ),
@@ -240,8 +256,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 }
 
 class ProductProperties extends StatefulWidget {
-  List<Property> productPropertiyList;
-  ProductProperties(
+  final List<Property> productPropertiyList;
+  const ProductProperties(
     this.productPropertiyList, {
     Key? key,
   }) : super(key: key);
@@ -339,8 +355,8 @@ class _ProductPropertiesState extends State<ProductProperties> {
 }
 
 class ProductDescription extends StatefulWidget {
-  String productDescription;
-  ProductDescription(
+  final String productDescription;
+  const ProductDescription(
     this.productDescription, {
     Key? key,
   }) : super(key: key);
@@ -426,8 +442,8 @@ class _ProductDescriptionState extends State<ProductDescription> {
 }
 
 class VariantContainerGenerator extends StatelessWidget {
-  List<ProductVariant> productVariantList;
-  VariantContainerGenerator(
+  final List<ProductVariant> productVariantList;
+  const VariantContainerGenerator(
     this.productVariantList, {
     Key? key,
   }) : super(key: key);
@@ -449,8 +465,8 @@ class VariantContainerGenerator extends StatelessWidget {
 }
 
 class VariantGeneratorChild extends StatelessWidget {
-  ProductVariant productVariant;
-  VariantGeneratorChild(this.productVariant, {super.key});
+  final ProductVariant productVariant;
+  const VariantGeneratorChild(this.productVariant, {super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -477,8 +493,8 @@ class VariantGeneratorChild extends StatelessWidget {
 }
 
 class GalleryWidget extends StatefulWidget {
-  List<ProductImage> productImageList;
-  String defaultProductThumbnail;
+  final List<ProductImage> productImageList;
+  final String defaultProductThumbnail;
   int selectedItem = 0;
   GalleryWidget(
     this.defaultProductThumbnail,
@@ -582,7 +598,8 @@ class _GalleryWidgetState extends State<GalleryWidget> {
 }
 
 class AddToBasketButton extends StatelessWidget {
-  const AddToBasketButton({Key? key}) : super(key: key);
+  final Product product;
+  const AddToBasketButton(this.product, {Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -601,17 +618,23 @@ class AddToBasketButton extends StatelessWidget {
           borderRadius: const BorderRadius.all(Radius.circular(15)),
           child: BackdropFilter(
             filter: ImageFilter.blur(sigmaY: 10, sigmaX: 10),
-            child: Container(
-              height: 53,
-              width: 160,
-              color: Colors.transparent,
-              child: const Center(
-                child: Text(
-                  'افزودن به سبد خرید',
-                  style: TextStyle(
-                    fontFamily: 'SB',
-                    fontSize: 16,
-                    color: Colors.white,
+            child: GestureDetector(
+              onTap: () {
+                context.read<ProductBloc>().add(ProductAddToBasket(product));
+                context.read<BasketBloc>().add(BasketFetchFromHiveEvent());
+              },
+              child: Container(
+                height: 53,
+                width: 160,
+                color: Colors.transparent,
+                child: const Center(
+                  child: Text(
+                    'افزودن به سبد خرید',
+                    style: TextStyle(
+                      fontFamily: 'SB',
+                      fontSize: 16,
+                      color: Colors.white,
+                    ),
                   ),
                 ),
               ),
@@ -674,11 +697,11 @@ class PriceTagButton extends StatelessWidget {
                         ),
                       ),
                     ),
-                    Column(
+                    const Column(
                       mainAxisSize: MainAxisSize.max,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       mainAxisAlignment: MainAxisAlignment.center,
-                      children: const [
+                      children: [
                         Text(
                           '۱۷٬۸۰۰٬۰۰۰',
                           style: TextStyle(
@@ -718,8 +741,8 @@ class PriceTagButton extends StatelessWidget {
 }
 
 class ColorVariantList extends StatefulWidget {
-  List<Variant> variantsList;
-  ColorVariantList(this.variantsList, {super.key});
+  final List<Variant> variantsList;
+  const ColorVariantList(this.variantsList, {super.key});
 
   @override
   State<ColorVariantList> createState() => _ColorVariantListState();
@@ -754,7 +777,8 @@ class _ColorVariantListState extends State<ColorVariantList> {
                       ? Border.all(
                           width: 2,
                           color: CustomColor.blueIndicator,
-                          strokeAlign: StrokeAlign.outside)
+                          strokeAlign: BorderSide.strokeAlignOutside,
+                        )
                       : Border.all(width: 2, color: Colors.white),
                   color: Color(hexColor),
                   borderRadius: const BorderRadius.all(Radius.circular(8)),
@@ -769,8 +793,8 @@ class _ColorVariantListState extends State<ColorVariantList> {
 }
 
 class StorageVariantList extends StatefulWidget {
-  List<Variant> storageVariants;
-  StorageVariantList(this.storageVariants, {super.key});
+  final List<Variant> storageVariants;
+  const StorageVariantList(this.storageVariants, {super.key});
 
   @override
   State<StorageVariantList> createState() => _StorageVariantListState();

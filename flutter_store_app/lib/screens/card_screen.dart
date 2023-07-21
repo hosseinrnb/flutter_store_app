@@ -1,6 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_store_app/bloc/basket/basket_bloc.dart';
+import 'package:flutter_store_app/bloc/basket/basket_event.dart';
+import 'package:flutter_store_app/bloc/basket/basket_state.dart';
 import 'package:flutter_store_app/constants/color.dart';
 import 'package:dotted_line/dotted_line.dart';
+import 'package:flutter_store_app/util/extensions/string_extension.dart';
+import 'package:flutter_store_app/widgets/cached_image.dart';
+
+import '../data/model/card_item.dart';
 
 class CardScreen extends StatelessWidget {
   const CardScreen({super.key});
@@ -11,76 +19,98 @@ class CardScreen extends StatelessWidget {
       backgroundColor: CustomColor.backgroundScreen,
       body: SafeArea(
         child: Center(
-          child: Stack(
-            alignment: AlignmentDirectional.bottomCenter,
-            children: [
-              CustomScrollView(
-                slivers: [
-                  SliverToBoxAdapter(
-                    child: Padding(
-                      padding: const EdgeInsets.only(
-                          left: 44, right: 44, top: 20, bottom: 10),
-                      child: Container(
-                        height: 46,
-                        decoration: const BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.all(Radius.circular(15)),
-                        ),
-                        child: Row(
-                          children: [
-                            const SizedBox(width: 16),
-                            Image.asset('assets/images/icon_apple_blue.png'),
-                            const Expanded(
-                              child: Text(
-                                'سبد خرید',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontFamily: 'SB',
-                                  color: CustomColor.blue,
-                                ),
-                              ),
+          child: BlocBuilder<BasketBloc, BasketState>(
+            builder: (context, state) {
+              return Stack(
+                alignment: AlignmentDirectional.bottomCenter,
+                children: [
+                  CustomScrollView(
+                    slivers: [
+                      SliverToBoxAdapter(
+                        child: Padding(
+                          padding: const EdgeInsets.only(
+                              left: 44, right: 44, top: 20, bottom: 10),
+                          child: Container(
+                            height: 46,
+                            decoration: const BoxDecoration(
+                              color: Colors.white,
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(15)),
                             ),
-                          ],
+                            child: Row(
+                              children: [
+                                const SizedBox(width: 16),
+                                Image.asset(
+                                    'assets/images/icon_apple_blue.png'),
+                                const Expanded(
+                                  child: Text(
+                                    'سبد خرید',
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontFamily: 'SB',
+                                      color: CustomColor.blue,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
                         ),
                       ),
-                    ),
-                  ),
-                  SliverList(
-                    delegate: SliverChildBuilderDelegate(
-                      (context, index) {
-                        return const CardItem();
+                      if (state is BasketDataFetchedState) ...{
+                        state.basketItemList.fold((l) {
+                          return SliverToBoxAdapter(
+                            child: Text(l),
+                          );
+                        }, (r) {
+                          return SliverList(
+                            delegate: SliverChildBuilderDelegate(
+                              (context, index) {
+                                return CardItem(r[index]);
+                              },
+                              childCount: r.length,
+                            ),
+                          );
+                        })
                       },
-                      childCount: 5,
-                    ),
+                      const SliverPadding(padding: EdgeInsets.only(bottom: 50)),
+                    ],
                   ),
-                  const SliverPadding(padding: EdgeInsets.only(bottom: 50)),
+                  if (state is BasketDataFetchedState) ...{
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 44,
+                        vertical: 10,
+                      ),
+                      child: SizedBox(
+                        height: 53,
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: CustomColor.green,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(15.0),
+                            ),
+                          ),
+                          child: Text(
+                            '${state.basketFinalPrice}',
+                            style: const TextStyle(
+                              fontFamily: 'SB',
+                              fontSize: 16,
+                            ),
+                          ),
+                          onPressed: () {
+                            context.read<BasketBloc>().add(BasketPaymentInitEvent());
+                            context.read<BasketBloc>().add(BasketPaymentRequestEvent());
+                          },
+                        ),
+                      ),
+                    )
+                  },
                 ],
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 44, vertical: 10,),
-                child: SizedBox(
-                  height: 53,
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: CustomColor.green,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(15.0),
-                      ),
-                    ),
-                    child: const Text(
-                      'ادامه فرآیند خرید',
-                      style: TextStyle(
-                        fontFamily: 'SB',
-                        fontSize: 16,
-                      ),
-                    ),
-                    onPressed: () {},
-                  ),
-                ),
-              ),
-            ],
+              );
+            },
           ),
         ),
       ),
@@ -89,7 +119,9 @@ class CardScreen extends StatelessWidget {
 }
 
 class CardItem extends StatelessWidget {
-  const CardItem({
+  final BasketItem basketItem;
+  const CardItem(
+    this.basketItem, {
     Key? key,
   }) : super(key: key);
 
@@ -111,7 +143,11 @@ class CardItem extends StatelessWidget {
               child: Row(
                 children: [
                   const SizedBox(width: 8.0),
-                  Image.asset('assets/images/iphone.png'),
+                  SizedBox(
+                    height: 105,
+                    width: 80,
+                    child: CachedImage(imageUrl: basketItem.thumbnail),
+                  ),
                   Expanded(
                     child: Padding(
                       padding: const EdgeInsets.symmetric(
@@ -119,25 +155,41 @@ class CardItem extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
-                            'آیفون ۱۳ پرومکس دو سیم کارت',
-                            style: TextStyle(
+                          Text(
+                            basketItem.name,
+                            style: const TextStyle(
                               fontFamily: 'SB',
                               fontSize: 15.0,
                             ),
                           ),
+                          const SizedBox(height: 5),
                           const Text(
-                            'گارانتی 18 ماه مدیا پردازش',
+                            '18 ماه گارانتی مدیا پردازش',
                             style: TextStyle(
                               color: CustomColor.grey,
                               fontFamily: 'SM',
                               fontSize: 12.0,
                             ),
                           ),
+                          const SizedBox(height: 5),
                           Row(
                             children: [
-                              const Text('۴۶٬۰۰۰٬۰۰۰ '),
-                              const Text('تومان '),
+                              const Text(
+                                '۴۶٬۰۰۰٬۰۰۰ ',
+                                style: TextStyle(
+                                  color: CustomColor.grey,
+                                  fontFamily: 'SM',
+                                  fontSize: 12.0,
+                                ),
+                              ),
+                              const Text(
+                                'تومان ',
+                                style: TextStyle(
+                                  color: CustomColor.grey,
+                                  fontFamily: 'SM',
+                                  fontSize: 12.0,
+                                ),
+                              ),
                               Container(
                                 decoration: const BoxDecoration(
                                   color: Colors.red,
@@ -159,25 +211,43 @@ class CardItem extends StatelessWidget {
                               ),
                             ],
                           ),
-                          Container(
-                            decoration: BoxDecoration(
-                              border:
-                                  Border.all(color: CustomColor.grey, width: 1),
-                              borderRadius:
-                                  const BorderRadius.all(Radius.circular(10)),
-                            ),
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 4, vertical: 2),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  const Text('۲۵۶ گیگابایت'),
-                                  const SizedBox(width: 5),
-                                  Image.asset('assets/images/icon_options.png'),
-                                ],
+                          const SizedBox(height: 12),
+                          Wrap(
+                            spacing: 10,
+                            children: [
+                              OptionCheap(
+                                'آبی',
+                                color: '4287f5',
                               ),
-                            ),
+                              Container(
+                                decoration: BoxDecoration(
+                                  border: Border.all(
+                                      color: CustomColor.grey, width: 1),
+                                  borderRadius: const BorderRadius.all(
+                                      Radius.circular(10)),
+                                ),
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 4, vertical: 2),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Image.asset(
+                                        'assets/images/icon_delete.png',
+                                      ),
+                                      const SizedBox(width: 5),
+                                      const Text(
+                                        'حذف',
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          fontFamily: 'SM',
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       ),
@@ -200,11 +270,74 @@ class CardItem extends StatelessWidget {
               padding: const EdgeInsets.symmetric(vertical: 15.0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: const [
-                  Text('۴۵٬۳۵۰٬۰۰۰'),
-                  SizedBox(width: 5),
-                  Text('تومان'),
+                children: [
+                  Text(
+                    '${basketItem.realPrice}',
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontFamily: 'SB',
+                    ),
+                  ),
+                  const SizedBox(width: 5),
+                  const Text(
+                    'تومان',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontFamily: 'SB',
+                    ),
+                  ),
                 ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class OptionCheap extends StatefulWidget {
+  final String? color;
+  final String title;
+  const OptionCheap(
+    this.title, {
+    Key? key,
+    this.color,
+  }) : super(key: key);
+
+  @override
+  State<OptionCheap> createState() => _OptionCheapState();
+}
+
+class _OptionCheapState extends State<OptionCheap> {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        border: Border.all(color: CustomColor.grey, width: 1),
+        borderRadius: const BorderRadius.all(Radius.circular(10)),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (widget.color != null) ...{
+              Container(
+                width: 14,
+                height: 14,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: widget.color.parseToColor(),
+                ),
+              ),
+            },
+            const SizedBox(width: 6),
+            Text(
+              widget.title,
+              style: const TextStyle(
+                fontSize: 12,
+                fontFamily: 'SM',
               ),
             ),
           ],

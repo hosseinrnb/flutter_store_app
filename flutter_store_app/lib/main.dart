@@ -1,22 +1,24 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_store_app/bloc/authentication/auth_bloc.dart';
+import 'package:flutter_store_app/bloc/basket/basket_bloc.dart';
+import 'package:flutter_store_app/bloc/basket/basket_event.dart';
 import 'package:flutter_store_app/bloc/category/category_bloc.dart';
 import 'package:flutter_store_app/bloc/home/home_bloc.dart';
 import 'package:flutter_store_app/constants/color.dart';
+import 'package:flutter_store_app/data/model/card_item.dart';
 import 'package:flutter_store_app/di/di.dart';
 import 'package:flutter_store_app/screens/card_screen.dart';
 import 'package:flutter_store_app/screens/category_screen.dart';
 import 'package:flutter_store_app/screens/home_screen.dart';
-import 'package:flutter_store_app/screens/login_screen.dart';
-import 'package:flutter_store_app/screens/product_detail_screen.dart';
 import 'package:flutter_store_app/screens/profile_screen.dart';
-import 'package:flutter_store_app/widgets/product_item.dart';
-import 'package:flutter_store_app/screens/product_list_screen.dart';
+import 'package:hive_flutter/adapters.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Hive.initFlutter();
+  Hive.registerAdapter(BasketItemAdapter());
+  await Hive.openBox<BasketItem>('CardBox');
   await getItInit();
   runApp(const MyApp());
 }
@@ -149,7 +151,13 @@ class _MyAppState extends State<MyApp> {
     return <Widget>[
       const ProfileScreen(),
       //ProductDetailScreen(),
-      const CardScreen(),
+      BlocProvider(create: (context) {
+        var bloc = locator.get<BasketBloc>();
+        bloc.add(BasketFetchFromHiveEvent());
+        return bloc;
+      },
+      child: const CardScreen(),
+      ),
       BlocProvider(
         create: (context) => CategoryBloc(),
         child: const CategoryScreen(),
