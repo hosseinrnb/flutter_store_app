@@ -16,5 +16,6 @@ For help getting started with Flutter development, view the
 samples, guidance on mobile development, and a full API reference.
 
 
-https://user-images.githubusercontent.com/105646453/213761708-11fa63f7-eb33-4f45-8295-0b10319f58d7.mp4
+
+![shop-app](https://github.com/hosseinrnb/flutter_store_app/assets/105646453/06d9564e-3c9d-4f14-9634-568225f9da1e)
 
