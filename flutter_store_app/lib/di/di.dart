@@ -5,6 +5,7 @@ import 'package:flutter_store_app/data/datasource/banner_datasource.dart';
 import 'package:flutter_store_app/data/datasource/basket_datasource.dart';
 import 'package:flutter_store_app/data/datasource/category_datasource.dart';
 import 'package:flutter_store_app/data/datasource/category_product_datasource.dart';
+import 'package:flutter_store_app/data/datasource/comment_datasource.dart';
 import 'package:flutter_store_app/data/datasource/product_datasource.dart';
 import 'package:flutter_store_app/data/datasource/product_detail_datasource.dart';
 import 'package:flutter_store_app/data/repository/authentication_repository.dart';
@@ -12,6 +13,7 @@ import 'package:flutter_store_app/data/repository/banner_repository.dart';
 import 'package:flutter_store_app/data/repository/basket_repository.dart';
 import 'package:flutter_store_app/data/repository/category_product_repository.dart';
 import 'package:flutter_store_app/data/repository/category_repository.dart';
+import 'package:flutter_store_app/data/repository/comments_repository.dart';
 import 'package:flutter_store_app/data/repository/product_detail_repository.dart';
 import 'package:flutter_store_app/data/repository/product_repository.dart';
 import 'package:flutter_store_app/util/payment_handler.dart';
@@ -54,7 +56,7 @@ void _initDatasoruces() {
       () => CategoryProductRemoteDatasource());
   locator.registerFactory<IBasketDatasource>(() => BasketLocalDatasource());
 
-  //locator.registerFactory<ICommentDatasource>(() => CommentRemoteDatasource());
+  locator.registerFactory<ICommentDatasource>(() => CommentRemoteDatasource());
 }
 
 void _initRepositories() {
@@ -68,5 +70,5 @@ void _initRepositories() {
       () => CategoryProductRepository());
   locator.registerFactory<IBasketRepository>(() => BasketRepository());
 
-  //locator.registerFactory<ICommentRepository>(() => CommentRepository());
+  locator.registerFactory<ICommentRepository>(() => CommentRepository());
 }

@@ -50,6 +50,8 @@ dependencies:
   url_launcher: ^6.1.11
   zarinpal: ^1.0.5
   uni_links: ^0.5.1
+  loading_indicator: ^3.1.1
+  intl: ^0.18.1
 
 dev_dependencies:
   flutter_test:

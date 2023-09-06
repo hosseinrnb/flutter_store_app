@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_store_app/bloc/basket/basket_bloc.dart';
-import 'package:flutter_store_app/bloc/product/product_bloc.dart';
 import 'package:flutter_store_app/constants/color.dart';
 import 'package:flutter_store_app/data/model/product.dart';
 import 'package:flutter_store_app/di/di.dart';
 import 'package:flutter_store_app/screens/product_detail_screen.dart';
+import 'package:flutter_store_app/util/extensions/int_extension.dart';
 import 'package:flutter_store_app/widgets/cached_image.dart';
 
 class ProductItem extends StatelessWidget {
@@ -128,7 +128,7 @@ class ProductItem extends StatelessWidget {
                         //crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            product.price.toString(),
+                            product.price.convertToPrice(),
                             style: const TextStyle(
                               fontSize: 12,
                               fontFamily: 'SM',
@@ -137,7 +137,7 @@ class ProductItem extends StatelessWidget {
                             ),
                           ),
                           Text(
-                            product.realPrice.toString(),
+                            product.realPrice.convertToPrice(),
                             style: const TextStyle(
                               fontSize: 15.5,
                               fontFamily: 'SM',

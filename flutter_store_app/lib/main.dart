@@ -5,6 +5,7 @@ import 'package:flutter_store_app/bloc/basket/basket_bloc.dart';
 import 'package:flutter_store_app/bloc/basket/basket_event.dart';
 import 'package:flutter_store_app/bloc/category/category_bloc.dart';
 import 'package:flutter_store_app/bloc/home/home_bloc.dart';
+import 'package:flutter_store_app/bloc/home/home_event.dart';
 import 'package:flutter_store_app/constants/color.dart';
 import 'package:flutter_store_app/data/model/card_item.dart';
 import 'package:flutter_store_app/di/di.dart';
@@ -151,22 +152,26 @@ class _MyAppState extends State<MyApp> {
     return <Widget>[
       const ProfileScreen(),
       //ProductDetailScreen(),
-      BlocProvider(create: (context) {
-        var bloc = locator.get<BasketBloc>();
-        bloc.add(BasketFetchFromHiveEvent());
-        return bloc;
-      },
-      child: const CardScreen(),
+      BlocProvider(
+        create: (context) {
+          var bloc = locator.get<BasketBloc>();
+          bloc.add(BasketFetchFromHiveEvent());
+          return bloc;
+        },
+        child: const CardScreen(),
       ),
       BlocProvider(
         create: (context) => CategoryBloc(),
         child: const CategoryScreen(),
       ),
       BlocProvider(
-        create: (context) => HomeBloc(),
+        create: (context) {
+          var bloc = HomeBloc();
+          bloc.add(HomeGetInitilizeData());
+          return bloc;
+        },
         child: const HomeScreen(),
       ),
     ];
   }
 }
-
