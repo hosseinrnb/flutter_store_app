@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter_store_app/data/model/comment.dart';
 import 'package:flutter_store_app/di/di.dart';
 import 'package:flutter_store_app/util/api_exception.dart';
+import 'package:flutter_store_app/util/auth_manager.dart';
 
 abstract class ICommentDatasource {
   Future<List<Comment>> getComments(String productId);
@@ -10,12 +11,14 @@ abstract class ICommentDatasource {
 
 class CommentRemoteDatasource extends ICommentDatasource {
   final Dio _dio = locator.get();
+  final String userId = AuthManger.getId();
 
   @override
   Future<List<Comment>> getComments(String productId) async {
-    Map<String, String> qParams = {
+    Map<String, dynamic> qParams = {
       'filter': 'product_id="$productId"',
-      'expand': 'user_id'
+      'expand': 'user_id',
+      'perPage': 100,
     };
     try {
       var response = await _dio.get('collections/comment/records',
@@ -40,7 +43,7 @@ class CommentRemoteDatasource extends ICommentDatasource {
         'collections/comment/records',
         data: {
           'text': comment,
-          'user_id': 'lkg8xc50i07oedn',
+          'user_id': userId,
           'product_id': productId,
         },
       );

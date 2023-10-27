@@ -1,20 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/container.dart';
-import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_store_app/bloc/authentication/auth_bloc.dart';
 import 'package:flutter_store_app/bloc/authentication/auth_event.dart';
 import 'package:flutter_store_app/bloc/authentication/auth_state.dart';
 import 'package:flutter_store_app/constants/color.dart';
-import 'package:flutter_store_app/main.dart';
-import 'package:flutter_store_app/screens/dashboard_screen.dart';
-import 'package:flutter_store_app/screens/register_screen.dart';
 
-class LoginScreen extends StatelessWidget {
-  LoginScreen({super.key});
+class RegisterScreen extends StatelessWidget {
+  RegisterScreen({super.key});
 
   final _usernameTextController = TextEditingController();
   final _passwordTextController = TextEditingController();
+  final _passwordConfirmTextController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -99,6 +95,27 @@ class LoginScreen extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 20),
+                    TextField(
+                      controller: _passwordConfirmTextController,
+                      decoration: const InputDecoration(
+                        labelText: 'تکرار رمز عبور',
+                        labelStyle: TextStyle(
+                          fontFamily: 'sm',
+                          fontSize: 18,
+                          color: Colors.black,
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(20)),
+                          borderSide: BorderSide(color: Colors.black, width: 2),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(20)),
+                          borderSide:
+                              BorderSide(color: CustomColor.blue, width: 3),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
                     BlocBuilder<AuthBloc, AuthState>(
                       builder: (context, state) {
                         if (state is AuthInitiateState) {
@@ -111,11 +128,14 @@ class LoginScreen extends StatelessWidget {
                                 borderRadius: BorderRadius.circular(15),
                               ),
                             ),
-                            child: const Text('ورود به حساب کاربری'),
+                            child: const Text('ساخت حساب کاربری'),
                             onPressed: () {
-                              BlocProvider.of<AuthBloc>(context).add(
-                                  AuthLoginRequest(_usernameTextController.text,
-                                      _passwordTextController.text));
+                              BlocProvider.of<AuthBloc>(context)
+                                  .add(AuthRegisterRequest(
+                                _usernameTextController.text,
+                                _passwordTextController.text,
+                                _passwordConfirmTextController.text,
+                              ));
                             },
                           );
                         }
@@ -136,36 +156,6 @@ class LoginScreen extends StatelessWidget {
 
                         return const Text('خطای نامشخص');
                       },
-                    ),
-                    const SizedBox(height: 20),
-                    TextButton(
-                      onPressed: () {
-                        Navigator.push(context, MaterialPageRoute(
-                          builder: (context) {
-                            return BlocProvider(
-                              create: (context) {
-                                var authBloc = AuthBloc();
-                                authBloc.stream.forEach((state) {
-                                  if (state is AuthResponseState) {
-                                    state.response.fold((l) {}, (r) {
-                                      globalNavigatorKey.currentState
-                                          ?.pushReplacement(
-                                        MaterialPageRoute(
-                                          builder: (context) =>
-                                              const DashBoardScreen(),
-                                        ),
-                                      );
-                                    });
-                                  }
-                                });
-                                return authBloc;
-                              },
-                              child: RegisterScreen(),
-                            );
-                          },
-                        ));
-                      },
-                      child: const Text('ثبت نام کنید'),
                     ),
                   ],
                 ),

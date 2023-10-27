@@ -1,28 +1,30 @@
 import 'package:dio/dio.dart';
-import 'package:flutter_store_app/di/di.dart';
 import 'package:flutter_store_app/util/api_exception.dart';
+import 'package:flutter_store_app/util/auth_manager.dart';
+import 'package:flutter_store_app/util/dio_provider.dart';
 
-
-abstract class IAuthenticationDatasource{
-  Future<void> register(String username, String password, String passwordConfirm);
+abstract class IAuthenticationDatasource {
+  Future<void> register(
+      String username, String password, String passwordConfirm);
 
   Future<String> login(String username, String password);
 }
 
+class AuthenticationRemote implements IAuthenticationDatasource {
+  final Dio _dio = DioProvider.creatDioWithoutHeader();
 
-
-class AuthenticationRemote implements IAuthenticationDatasource{
-
-  final Dio _dio = locator.get();
-  
   @override
-  Future<void> register(String username, String password, String passwordConfirm) async {
+  Future<void> register(
+      String username, String password, String passwordConfirm) async {
     try {
       final response = await _dio.post('collections/users/records', data: {
         'username': username,
         'password': password,
         'passwordConfirm': passwordConfirm,
       });
+      if (response.statusCode == 200) {
+        AuthManger.saveId(response.data?['id']);
+      }
     } on DioError catch (ex) {
       throw ApiException(
         ex.response?.statusCode,
@@ -32,19 +34,20 @@ class AuthenticationRemote implements IAuthenticationDatasource{
       throw ApiException(0, 'unknown error');
     }
   }
-  
+
   @override
   Future<String> login(String username, String password) async {
     try {
-      var response = await _dio.post('collections/users/auth-with-password', data: {
-      'identity':username,
-      'password':password,
-    });
+      var response =
+          await _dio.post('collections/users/auth-with-password', data: {
+        'identity': username,
+        'password': password,
+      });
 
-    if (response.statusCode == 200) {
-      return response.data?['token'];
-    }
-
+      if (response.statusCode == 200) {
+        AuthManger.saveId(response.data?['record']['id']);
+        return response.data?['token'];
+      }
     } on DioError catch (ex) {
       throw ApiException(
         ex.response?.statusCode,
@@ -56,7 +59,4 @@ class AuthenticationRemote implements IAuthenticationDatasource{
 
     return '';
   }
-
-  
-
 }

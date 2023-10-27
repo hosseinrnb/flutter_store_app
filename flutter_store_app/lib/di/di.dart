@@ -16,6 +16,7 @@ import 'package:flutter_store_app/data/repository/category_repository.dart';
 import 'package:flutter_store_app/data/repository/comments_repository.dart';
 import 'package:flutter_store_app/data/repository/product_detail_repository.dart';
 import 'package:flutter_store_app/data/repository/product_repository.dart';
+import 'package:flutter_store_app/util/dio_provider.dart';
 import 'package:flutter_store_app/util/payment_handler.dart';
 import 'package:flutter_store_app/util/url_handler.dart';
 import 'package:get_it/get_it.dart';
@@ -34,13 +35,12 @@ Future<void> getItInit() async {
 }
 
 Future<void> _initComponents() async {
+  locator.registerSingleton<SharedPreferences>(
+      await SharedPreferences.getInstance());
   locator.registerSingleton<UrlHandler>(UrlLauncher());
   locator
       .registerSingleton<PaymentHandler>(ZarinpalPaymentHandler(locator.get()));
-  locator.registerSingleton<Dio>(
-      Dio(BaseOptions(baseUrl: 'http://startflutter.ir/api/')));
-  locator.registerSingleton<SharedPreferences>(
-      await SharedPreferences.getInstance());
+  locator.registerSingleton<Dio>(DioProvider.creatDio());
 }
 
 void _initDatasoruces() {

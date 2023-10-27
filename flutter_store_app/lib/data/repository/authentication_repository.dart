@@ -5,29 +5,28 @@ import 'package:flutter_store_app/util/api_exception.dart';
 import 'package:flutter_store_app/util/auth_manager.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+abstract class IAuthRepository {
+  Future<Either<String, String>> register(
+      String username, String password, String passwordConfirm);
 
-abstract class IAuthRepository{
-  Future<Either<String,String>> register(String username, String password, String passwordConfirm);
-
-  Future<Either<String,String>> login(String username, String password);
+  Future<Either<String, String>> login(String username, String password);
 }
 
-
-
-class AuthenticationRepository implements IAuthRepository{
+class AuthenticationRepository implements IAuthRepository {
   final IAuthenticationDatasource _datasource = locator.get();
   final SharedPreferences _sharedPref = locator.get();
-  
+
   @override
-  Future<Either<String, String>> register(String username, String password, String passwordConfirm) async {
+  Future<Either<String, String>> register(
+      String username, String password, String passwordConfirm) async {
     try {
-      await _datasource.register('Hosseinali', '12345678', '12345678');
+      await _datasource.register(username, password, passwordConfirm);
       return right('ثبت نام با موفقیت انجام شد');
     } on ApiException catch (ex) {
       return left(ex.message!);
     }
   }
-  
+
   @override
   Future<Either<String, String>> login(String username, String password) async {
     try {
@@ -42,6 +41,4 @@ class AuthenticationRepository implements IAuthRepository{
       return left(ex.message!);
     }
   }
-
-  
 }
