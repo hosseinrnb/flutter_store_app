@@ -410,7 +410,13 @@ class CommentBottomSheet extends StatelessWidget {
                       ),
                     ),
                     ElevatedButton(
-                      child: const Text('ارسال'),
+                      child: const Text(
+                        'ارسال نظر',
+                        style: TextStyle(
+                          fontFamily: 'sm',
+                          fontSize: 20.0,
+                        ),
+                      ),
                       onPressed: () {
                         if (textController.text.isEmpty) {
                           return;

@@ -19,16 +19,18 @@ class AuthenticationRemote implements IAuthenticationDatasource {
     try {
       final response = await _dio.post('collections/users/records', data: {
         'username': username,
+        'name': username,
         'password': password,
         'passwordConfirm': passwordConfirm,
       });
       if (response.statusCode == 200) {
-        AuthManger.saveId(response.data?['id']);
+        login(username, password);
       }
     } on DioError catch (ex) {
       throw ApiException(
         ex.response?.statusCode,
         ex.response?.data['message'],
+        response: ex.response,
       );
     } catch (e) {
       throw ApiException(0, 'unknown error');
@@ -46,12 +48,14 @@ class AuthenticationRemote implements IAuthenticationDatasource {
 
       if (response.statusCode == 200) {
         AuthManger.saveId(response.data?['record']['id']);
+        AuthManger.saveToken(response.data?['token']);
         return response.data?['token'];
       }
     } on DioError catch (ex) {
       throw ApiException(
         ex.response?.statusCode,
         ex.response?.data['message'],
+        response: ex.response,
       );
     } catch (e) {
       throw ApiException(0, 'unknown error');

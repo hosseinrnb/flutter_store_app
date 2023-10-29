@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_store_app/bloc/authentication/auth_bloc.dart';
 import 'package:flutter_store_app/data/model/card_item.dart';
 import 'package:flutter_store_app/di/di.dart';
 import 'package:flutter_store_app/screens/dashboard_screen.dart';
@@ -35,10 +33,7 @@ class _MyAppState extends State<MyApp> {
       navigatorKey: globalNavigatorKey,
       debugShowCheckedModeBanner: false,
       home: (AuthManger.readAuth().isEmpty)
-          ? BlocProvider(
-              create: (context) => AuthBloc(),
-              child: LoginScreen(),
-            )
+          ? LoginScreen()
           : const DashBoardScreen(),
     );
   }

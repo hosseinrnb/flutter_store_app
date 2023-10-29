@@ -49,32 +49,11 @@ class ProfileScreen extends StatelessWidget {
             ElevatedButton(
               onPressed: () {
                 AuthManger.logOut();
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) {
-                      return BlocProvider(
-                        create: (context) {
-                          var authBloc = AuthBloc();
-                          authBloc.stream.forEach((state) {
-                            if (state is AuthResponseState) {
-                              state.response.fold((l) {}, (r) {
-                                globalNavigatorKey.currentState
-                                    ?.pushReplacement(
-                                  MaterialPageRoute(
-                                    builder: (context) =>
-                                        const DashBoardScreen(),
-                                  ),
-                                );
-                              });
-                            }
-                          });
-                          return authBloc;
-                        },
-                        child: LoginScreen(),
-                      );
-                    },
-                  ),
-                );
+                Navigator.of(context).pushReplacement(MaterialPageRoute(
+                  builder: (context) {
+                    return LoginScreen();
+                  },
+                ));
               },
               child: const Text('خروج'),
             ),
